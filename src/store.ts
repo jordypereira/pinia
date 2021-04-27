@@ -20,6 +20,7 @@ import {
   Method,
   DefineStoreOptions,
   StoreDefinition,
+  GettersTree,
 } from './types'
 import {
   getActivePinia,
@@ -263,7 +264,7 @@ let isDevWarned: boolean | undefined
 export function defineStore<
   Id extends string,
   S extends StateTree,
-  G /* extends Record<string, StoreGetterThis> */,
+  G extends GettersTree<S>,
   A /* extends Record<string, StoreAction> */
 >(options: DefineStoreOptions<Id, S, G, A>): StoreDefinition<Id, S, G, A> {
   const { id, state, getters, actions } = options

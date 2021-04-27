@@ -15,6 +15,8 @@ describe('store plugins', () => {
   const useStore = defineStore({
     id: 'test',
 
+    state: () => ({ n: 0 }),
+
     actions: {
       incrementN() {
         return this.n++

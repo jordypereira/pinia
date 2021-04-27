@@ -26,13 +26,7 @@ export function isPlainObject(
   )
 }
 
-/**
- * Store Getter
- * @internal
- */
-export interface StoreGetter<S extends StateTree, T = any> {
-  (state: S, getters: Record<string, Ref<any>>): T
-}
+export type GettersTree<S extends StateTree> = Record<string, (state: S) => any>
 
 export type DeepPartial<T> = { [K in keyof T]?: DeepPartial<T[K]> }
 // type DeepReadonly<T> = { readonly [P in keyof T]: DeepReadonly<T[P]> }
@@ -107,6 +101,7 @@ export type Method = (...args: any[]) => any
 // in this type we forget about this because otherwise the type is recursive
 /**
  * Store augmented for actions
+ *
  * @internal
  */
 export type StoreWithActions<A> = {
@@ -115,19 +110,13 @@ export type StoreWithActions<A> = {
     : never
 }
 
-// export interface StoreGetter<S extends StateTree, T = any> {
-//   // TODO: would be nice to be able to define the getters here
-//   (state: S, getters: Record<string, Ref<any>>): T
-// }
-
 /**
  * Store augmented with getters
+ *
  * @internal
  */
 export type StoreWithGetters<G> = {
-  [k in keyof G]: G[k] extends (this: infer This, store?: any) => infer R
-    ? R
-    : never
+  [k in keyof G]: G[k] extends (...args: any[]) => infer R ? R : never
 }
 
 // // in this type we forget about this because otherwise the type is recursive
@@ -144,7 +133,7 @@ export type StoreWithGetters<G> = {
 export type Store<
   Id extends string,
   S extends StateTree,
-  G,
+  G /* extends GettersTree<S> */,
   // has the actions without the context (this) for typings
   A
 > = StoreWithState<Id, S> &
@@ -159,7 +148,7 @@ export type Store<
 export interface StoreDefinition<
   Id extends string,
   S extends StateTree,
-  G /* extends Record<string, StoreGetterThis> */,
+  G /* extends GettersTree<S> */,
   A /* extends Record<string, StoreAction> */
 > {
   (pinia?: Pinia | null | undefined): Store<Id, S, G, A>
@@ -203,7 +192,7 @@ export interface PiniaCustomProperties<
 export interface DefineStoreOptions<
   Id extends string,
   S extends StateTree,
-  G /* extends Record<string, StoreGetterThis> */,
+  G /* extends GettersTree<S> */,
   A /* extends Record<string, StoreAction> */
 > {
   id: Id
